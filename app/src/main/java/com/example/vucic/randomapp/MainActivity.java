@@ -19,33 +19,48 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
+import com.example.vucic.randomapp.fragments.LockScreenFragment;
+
+import org.greenrobot.eventbus.EventBus;
+
 public class MainActivity extends AppCompatActivity {
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
+    boolean inEditMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        inEditMode = false;
+
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
+        assert mViewPager != null;
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        assert tabLayout != null;
         tabLayout.setupWithViewPager(mViewPager);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        assert fab != null;
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                inEditMode = !inEditMode;
+                if (inEditMode) {
+                    Snackbar.make(view, "Change password mode", Snackbar.LENGTH_SHORT)
+                            .setAction("Action", null).show();
+                    EventBus.getDefault().post(true);
+                } else {
+                    Snackbar.make(view, "Regular mode", Snackbar.LENGTH_SHORT)
+                            .setAction("Action", null).show();
+                    EventBus.getDefault().post(false);
+                }
             }
         });
 
@@ -121,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
+            if (position == 0) return LockScreenFragment.newInstance();
             return PlaceholderFragment.newInstance(position + 1);
         }
 
@@ -133,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "SECTION 1";
+                    return "Lock that screen";
                 case 1:
                     return "SECTION 2";
                 case 2:
